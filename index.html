@@ -547,6 +547,186 @@
             animation: none;
             height: 3px !important;
         }
+
+        /* ── Photocards Section ── */
+        #photocards-section {
+            display: none;
+            text-align: center;
+            padding: 60px 0;
+            overflow: hidden;
+        }
+
+        .photocards-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: clamp(28px, 7vw, 44px);
+            color: #c9a0dc;
+            margin-bottom: 36px;
+            padding: 0 24px;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 30px calc(50vw - 130px);
+            scroll-behavior: smooth;
+        }
+
+        .carousel-track::-webkit-scrollbar { display: none; }
+
+        .photocard {
+            flex: 0 0 240px;
+            height: 340px;
+            border-radius: 16px;
+            scroll-snap-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(201, 160, 220, .2);
+            box-shadow: 0 8px 30px rgba(30, 18, 51, .5);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease, opacity 0.4s ease;
+            cursor: pointer;
+            opacity: 0.5;
+            transform: scale(0.85);
+        }
+
+        .photocard.active {
+            opacity: 1;
+            transform: scale(1);
+            border-color: rgba(201, 160, 220, .4);
+            box-shadow:
+                0 12px 40px rgba(155, 89, 182, .3),
+                0 0 20px rgba(155, 89, 182, .1);
+        }
+
+        .photocard:hover {
+            transform: scale(1.03) translateY(-6px);
+            box-shadow:
+                0 16px 50px rgba(155, 89, 182, .4),
+                0 0 30px rgba(155, 89, 182, .15);
+            border-color: rgba(201, 160, 220, .5);
+        }
+
+        .photocard.active:hover {
+            transform: scale(1.05) translateY(-8px);
+        }
+
+        .photocard::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, transparent 30%, rgba(201, 160, 220, .15) 50%, transparent 70%);
+            background-size: 250% 250%;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .photocard:hover::before {
+            opacity: 1;
+            animation: cardShimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes cardShimmer {
+            0%   { background-position: 100% 100%; }
+            100% { background-position: -100% -100%; }
+        }
+
+        .photocard-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+        }
+
+        .photocard-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            font-size: 48px;
+        }
+
+        .photocard-placeholder-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .4);
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        .photocard-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 14px;
+            background: linear-gradient(to top, rgba(26, 10, 30, .85) 0%, transparent 100%);
+            z-index: 3;
+            text-align: left;
+        }
+
+        .photocard-caption .caption-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #e8d5f5;
+            margin-bottom: 2px;
+        }
+
+        .photocard-caption .caption-sub {
+            font-size: 11px;
+            color: rgba(201, 160, 220, .7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .carousel-ind {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(201, 160, 220, .2);
+            border: 1px solid rgba(201, 160, 220, .3);
+            transition: all 0.3s;
+        }
+
+        .carousel-ind.active {
+            background: #9b59b6;
+            box-shadow: 0 0 8px rgba(155, 89, 182, .4);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .photocard {
+                flex: 0 0 200px;
+                height: 290px;
+            }
+            .carousel-track {
+                padding: 24px calc(50vw - 110px);
+                gap: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -565,6 +745,7 @@
         <div class="nav-dot active" data-section="heart-section"></div>
         <div class="nav-dot" data-section="message-section"></div>
         <div class="nav-dot" data-section="reasons-section"></div>
+        <div class="nav-dot" data-section="photocards-section"></div>
         <div class="nav-dot" data-section="surprise-section"></div>
     </div>
 
@@ -619,10 +800,76 @@
             <li class="reason-item"><span class="emoji">💜</span>Você me inspira todos os dias</li>
             <li class="reason-item"><span class="emoji">🦋</span>Eu te escolheria em todas as vidas</li>
         </ul>
-        <div class="scroll-arrow" id="reasonsArrow" onclick="scrollToSection('surprise-section')">⬇</div>
+        <div class="scroll-arrow" id="reasonsArrow" onclick="scrollToSection('photocards-section')">⬇</div>
     </section>
 
-    <!-- 4 · Surprise -->
+    <!-- 4 · Photocards -->
+    <section id="photocards-section">
+        <h2 class="photocards-title">Nossos momentos 💜</h2>
+        <div class="carousel-wrapper">
+            <div class="carousel-track" id="carouselTrack">
+                <div class="photocard" data-idx="0">
+                    <div class="photocard-bg" style="background: linear-gradient(135deg, #2d1b3d, #4a2d6b);"></div>
+                    <div class="photocard-placeholder">🦋<span class="photocard-placeholder-text">foto 1</span></div>
+                    <div class="photocard-caption">
+                        <div class="caption-title">Nosso primeiro encontro</div>
+                        <div class="caption-sub">um dia especial</div>
+                    </div>
+                </div>
+                <div class="photocard" data-idx="1">
+                    <div class="photocard-bg" style="background: linear-gradient(135deg, #3d1b4a, #5b2d7b);"></div>
+                    <div class="photocard-placeholder">💜<span class="photocard-placeholder-text">foto 2</span></div>
+                    <div class="photocard-caption">
+                        <div class="caption-title">Aquele sorriso lindo</div>
+                        <div class="caption-sub">meu favorito</div>
+                    </div>
+                </div>
+                <div class="photocard" data-idx="2">
+                    <div class="photocard-bg" style="background: linear-gradient(135deg, #2d1b3d, #6b2d5a);"></div>
+                    <div class="photocard-placeholder">🌙<span class="photocard-placeholder-text">foto 3</span></div>
+                    <div class="photocard-caption">
+                        <div class="caption-title">Juntos sempre</div>
+                        <div class="caption-sub">pra sempre</div>
+                    </div>
+                </div>
+                <div class="photocard" data-idx="3">
+                    <div class="photocard-bg" style="background: linear-gradient(135deg, #4a1b3d, #5b2d6b);"></div>
+                    <div class="photocard-placeholder">⭐<span class="photocard-placeholder-text">foto 4</span></div>
+                    <div class="photocard-caption">
+                        <div class="caption-title">Minha estrela</div>
+                        <div class="caption-sub">brilha mais que todas</div>
+                    </div>
+                </div>
+                <div class="photocard" data-idx="4">
+                    <div class="photocard-bg" style="background: linear-gradient(135deg, #2d1b4a, #4a2d7b);"></div>
+                    <div class="photocard-placeholder">🦋<span class="photocard-placeholder-text">foto 5</span></div>
+                    <div class="photocard-caption">
+                        <div class="caption-title">Nosso lugar</div>
+                        <div class="caption-sub">onde tudo faz sentido</div>
+                    </div>
+                </div>
+                <div class="photocard" data-idx="5">
+                    <div class="photocard-bg" style="background: linear-gradient(135deg, #3d1b3d, #6b2d6b);"></div>
+                    <div class="photocard-placeholder">💜<span class="photocard-placeholder-text">foto 6</span></div>
+                    <div class="photocard-caption">
+                        <div class="caption-title">I Purple You</div>
+                        <div class="caption-sub">pra sempre</div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-indicators" id="carouselIndicators">
+                <div class="carousel-ind active"></div>
+                <div class="carousel-ind"></div>
+                <div class="carousel-ind"></div>
+                <div class="carousel-ind"></div>
+                <div class="carousel-ind"></div>
+                <div class="carousel-ind"></div>
+            </div>
+        </div>
+        <div class="scroll-arrow" id="photocardsArrow" onclick="scrollToSection('surprise-section')">⬇</div>
+    </section>
+
+    <!-- 5 · Surprise -->
     <section id="surprise-section">
         <button class="surprise-btn" id="surpriseBtn">💜 Toque aqui, meu amor 💜</button>
         <div class="final-message" id="finalMsg">I Purple You 💜</div>
@@ -770,7 +1017,7 @@
         // ═══════════════════════════════════════
         //  Section transitions
         // ═══════════════════════════════════════
-        const sections = ['intro', 'heart-section', 'message-section', 'reasons-section', 'surprise-section'];
+        const sections = ['intro', 'heart-section', 'message-section', 'reasons-section', 'photocards-section', 'surprise-section'];
 
         function showSection(id) {
             const el = document.getElementById(id);
@@ -805,6 +1052,7 @@
         // ═══════════════════════════════════════
         let reasonsRevealed = false;
         let messageTyped = false;
+        let photocardsRevealed = false;
 
         function setupObserver() {
             const observer = new IntersectionObserver(entries => {
@@ -830,12 +1078,72 @@
                             document.getElementById('reasonsArrow').classList.add('visible');
                         }, 2500);
                     }
+
+                    if (id === 'photocards-section' && !photocardsRevealed) {
+                        photocardsRevealed = true;
+                        initCarousel();
+                        setTimeout(() => {
+                            document.getElementById('photocardsArrow').classList.add('visible');
+                        }, 1500);
+                    }
                 });
-            }, { threshold: 0.4 });
+            }, { threshold: 0.3 });
 
             sections.slice(1).forEach(id => {
                 const el = document.getElementById(id);
                 if (el) observer.observe(el);
+            });
+        }
+
+        // ═══════════════════════════════════════
+        //  Carousel
+        // ═══════════════════════════════════════
+        function initCarousel() {
+            const track = document.getElementById('carouselTrack');
+            const cards = track.querySelectorAll('.photocard');
+            const indicators = document.querySelectorAll('.carousel-ind');
+
+            function updateActiveCard() {
+                const trackRect = track.getBoundingClientRect();
+                const center = trackRect.left + trackRect.width / 2;
+                let closestIdx = 0;
+                let closestDist = Infinity;
+
+                cards.forEach((card, i) => {
+                    const rect = card.getBoundingClientRect();
+                    const cardCenter = rect.left + rect.width / 2;
+                    const dist = Math.abs(center - cardCenter);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        closestIdx = i;
+                    }
+                });
+
+                cards.forEach((card, i) => {
+                    card.classList.toggle('active', i === closestIdx);
+                });
+                indicators.forEach((ind, i) => {
+                    ind.classList.toggle('active', i === closestIdx);
+                });
+            }
+
+            track.addEventListener('scroll', updateActiveCard, { passive: true });
+
+            indicators.forEach((ind, i) => {
+                ind.addEventListener('click', () => {
+                    cards[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                });
+            });
+
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                });
+            });
+
+            requestAnimationFrame(() => {
+                cards[0].scrollIntoView({ inline: 'center', block: 'nearest' });
+                updateActiveCard();
             });
         }
 
@@ -855,6 +1163,7 @@
                 showSection('heart-section');
                 showSection('message-section');
                 showSection('reasons-section');
+                showSection('photocards-section');
                 showSection('surprise-section');
                 document.getElementById('navDots').classList.add('active');
                 document.getElementById('musicToggle').classList.add('active');
