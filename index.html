@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para Você 💜</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600&family=Quicksand:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
         * {
             margin: 0;
@@ -17,7 +17,7 @@
             min-height: 100vh;
             background: linear-gradient(135deg, #1a0a1e 0%, #2d1b3d 35%, #1e1233 65%, #1a0a1e 100%);
             overflow-x: hidden;
-            font-family: 'Quicksand', sans-serif;
+            font-family: 'Poppins', sans-serif;
             color: #fff;
         }
 
@@ -86,6 +86,20 @@
             position: absolute;
             bottom: -60px;
             opacity: 0;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        .float-item:hover {
+            filter: brightness(1.5) drop-shadow(0 0 8px rgba(155, 89, 182, .6));
+        }
+
+        .float-item.touched {
+            animation-play-state: paused !important;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            transform: scale(2) rotate(20deg) !important;
+            opacity: 0 !important;
         }
 
         .float-heart {
@@ -271,7 +285,8 @@
         }
 
         .message-title {
-            font-family: 'Dancing Script', cursive;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
             font-size: clamp(32px, 8vw, 56px);
             background: linear-gradient(135deg, #c9a0dc, #ffb6c1, #c9a0dc);
             background-size: 200% 200%;
@@ -327,7 +342,8 @@
         }
 
         .reasons-title {
-            font-family: 'Dancing Script', cursive;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
             font-size: clamp(28px, 7vw, 44px);
             color: #c9a0dc;
             margin-bottom: 32px;
@@ -370,8 +386,9 @@
         .surprise-btn {
             position: relative;
             padding: 18px 48px;
-            font-family: 'Dancing Script', cursive;
-            font-size: 24px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 20px;
             color: #fff;
             background: linear-gradient(135deg, #9b59b6, #c9a0dc);
             border: none;
@@ -666,6 +683,24 @@
                 font-size: ${Math.random() * 14 + 14}px;
                 animation-delay: ${Math.random() * 2}s;
             `;
+
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const rect = el.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                burstHearts(cx, cy);
+                el.classList.add('touched');
+                setTimeout(() => el.remove(), 500);
+            });
+
+            el.addEventListener('mouseenter', () => {
+                el.style.filter = 'brightness(1.5) drop-shadow(0 0 12px rgba(155,89,182,.7))';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.filter = '';
+            });
+
             container.appendChild(el);
             setTimeout(() => el.remove(), 15000);
         }
