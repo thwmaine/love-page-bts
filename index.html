@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>for you 💜</title>
+    <title>tomyella</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -1072,6 +1072,24 @@ ps: setting up this site was a bit of a struggle, but it's not even one percent 
             window.addEventListener('resize', layout);
 
             let liftedIdx = -1;
+            let touchHoverIdx = -1;
+
+            function updateTouchHover(clientX, clientY) {
+                const el = document.elementFromPoint(clientX, clientY);
+                const card = el && el.closest('.photocard');
+                const idx = card ? Array.from(cards).indexOf(card) : -1;
+                if (idx === touchHoverIdx) return;
+                if (touchHoverIdx >= 0 && touchHoverIdx !== liftedIdx) resetCard(cards[touchHoverIdx], touchHoverIdx);
+                touchHoverIdx = -1;
+                if (idx >= 0 && idx !== liftedIdx) {
+                    applyHoverEffect(cards[idx]);
+                    touchHoverIdx = idx;
+                }
+            }
+
+            container.addEventListener('touchmove', (e) => {
+                if (e.touches.length) updateTouchHover(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
 
             cards.forEach((card, i) => {
                 card.addEventListener('mouseenter', () => {
@@ -1080,11 +1098,17 @@ ps: setting up this site was a bit of a struggle, but it's not even one percent 
                 card.addEventListener('mouseleave', () => {
                     if (liftedIdx !== i) resetCard(card, i);
                 });
-                card.addEventListener('touchstart', () => {
-                    if (liftedIdx !== i) applyHoverEffect(card);
+                card.addEventListener('touchstart', (e) => {
+                    if (liftedIdx !== i) {
+                        applyHoverEffect(card);
+                        touchHoverIdx = i;
+                    }
                 }, { passive: true });
                 card.addEventListener('touchend', () => {
-                    setTimeout(() => { if (liftedIdx !== i) resetCard(card, i); }, 0);
+                    setTimeout(() => {
+                        if (touchHoverIdx >= 0 && touchHoverIdx !== liftedIdx) resetCard(cards[touchHoverIdx], touchHoverIdx);
+                        touchHoverIdx = -1;
+                    }, 0);
                 }, { passive: true });
                 card.addEventListener('click', (e) => {
                     e.stopPropagation();
