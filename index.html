@@ -556,24 +556,25 @@
             position: relative;
             width: 100%;
             max-width: 750px;
-            height: 380px;
+            height: 260px;
             margin: 0 auto;
         }
 
         .photocard {
             position: absolute;
-            width: clamp(130px, 22vw, 180px);
-            height: clamp(185px, 31vw, 260px);
+            width: 100px;
+            height: 145px;
             border-radius: 14px;
             overflow: hidden;
             border: 2px solid rgba(201, 160, 220, .25);
             box-shadow: 0 8px 25px rgba(30, 18, 51, .6);
             cursor: pointer;
-            transform-origin: 50% 90%;
+            transform-origin: 50% 50%;
             opacity: 0;
-            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+            transition: transform 0.6s ease,
                         box-shadow 0.4s ease,
                         border-color 0.4s ease,
+                        z-index 0s,
                         opacity 0.6s ease;
         }
 
@@ -581,13 +582,22 @@
             opacity: 1;
         }
 
-        .photocard:hover {
+        .photocard.lifted {
+            z-index: 20 !important;
             box-shadow:
                 0 16px 50px rgba(155, 89, 182, .45),
                 0 0 25px rgba(155, 89, 182, .15);
             border-color: rgba(201, 160, 220, .5);
-            z-index: 20 !important;
-            transform: translateY(-14px) rotate(0deg) scale(1.06) !important;
+        }
+
+        @media (hover: hover) {
+            .photocard:hover {
+                box-shadow:
+                    0 16px 50px rgba(155, 89, 182, .45),
+                    0 0 25px rgba(155, 89, 182, .15);
+                border-color: rgba(201, 160, 220, .5);
+                z-index: 20 !important;
+            }
         }
 
         .photocard::before {
@@ -664,18 +674,19 @@
             letter-spacing: 1px;
         }
 
-        @media (min-width: 700px) {
-            .fan-container {
-                height: 420px;
-                max-width: 900px;
-            }
-            .photocard {
-                width: 190px;
-                height: 275px;
-            }
-            .photocard-placeholder { font-size: 48px; }
-            .photocard-caption .caption-title { font-size: 13px; }
-            .photocard-caption .caption-sub { font-size: 10px; }
+        @media (min-width: 420px) {
+            .fan-container { height: 300px; }
+            .photocard { width: 120px; height: 175px; }
+        }
+
+        @media (min-width: 600px) {
+            .fan-container { height: 360px; }
+            .photocard { width: 155px; height: 225px; }
+        }
+
+        @media (min-width: 800px) {
+            .fan-container { height: 420px; max-width: 900px; }
+            .photocard { width: 190px; height: 275px; }
         }
     </style>
 </head>
@@ -1009,36 +1020,54 @@
             const yShifts = [ 16,  4, 0, 4, 16];
             const zIndexes = [ 1,  2, 3, 2,  1];
 
-            const containerW = container.offsetWidth;
-            const cardW = cards[0].offsetWidth;
-            const overlap = Math.max(0.55, Math.min(0.72, containerW / (total * cardW)));
-            const step = cardW * overlap;
-            const totalWidth = step * (total - 1) + cardW;
-            const startX = (containerW - totalWidth) / 2;
+            function layout() {
+                const containerW = container.offsetWidth;
+                const cardW = cards[0].offsetWidth;
+                const overlap = Math.max(0.55, Math.min(0.75, containerW / (total * cardW)));
+                const step = cardW * overlap;
+                const totalWidth = step * (total - 1) + cardW;
+                const startX = (containerW - totalWidth) / 2;
+
+                cards.forEach((card, i) => {
+                    card.style.left = startX + i * step + 'px';
+                    card.style.top = '50%';
+                    resetCard(card, i);
+                    setTimeout(() => card.classList.add('spread'), i * 120);
+                });
+            }
+
+            function resetCard(card, i) {
+                card.classList.remove('lifted');
+                card.style.zIndex = zIndexes[i];
+                card.style.transform = `translateY(calc(-50% + ${yShifts[i]}px)) rotate(${angles[i]}deg)`;
+            }
+
+            layout();
+            window.addEventListener('resize', layout);
+
+            let liftedIdx = -1;
 
             cards.forEach((card, i) => {
-                card.style.left = (startX + i * step) + 'px';
-                card.style.top = '50%';
-                card.style.zIndex = zIndexes[i] || 1;
-                card.style.transform = `translateY(calc(-50% + ${yShifts[i]}px)) rotate(${angles[i]}deg)`;
-
-                setTimeout(() => {
-                    card.classList.add('spread');
-                }, i * 120);
-            });
-
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    const wasTop = card.style.zIndex === '10';
-                    cards.forEach((c, j) => {
-                        c.style.zIndex = zIndexes[j] || 1;
-                        c.style.transform = `translateY(calc(-50% + ${yShifts[j]}px)) rotate(${angles[j]}deg)`;
-                    });
-                    if (!wasTop) {
-                        card.style.zIndex = '10';
-                        card.style.transform = `translateY(calc(-50% - 20px)) rotate(0deg) scale(1.08)`;
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (liftedIdx === i) {
+                        resetCard(card, i);
+                        liftedIdx = -1;
+                    } else {
+                        cards.forEach((c, j) => resetCard(c, j));
+                        card.classList.add('lifted');
+                        card.style.zIndex = 20;
+                        card.style.transform = `translateY(calc(-50% - 15px)) rotate(0deg) scale(1.05)`;
+                        liftedIdx = i;
                     }
                 });
+            });
+
+            document.addEventListener('click', () => {
+                if (liftedIdx >= 0) {
+                    cards.forEach((c, j) => resetCard(c, j));
+                    liftedIdx = -1;
+                }
             });
         }
 
