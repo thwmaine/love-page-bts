@@ -590,12 +590,17 @@
             border-color: rgba(201, 160, 220, .5);
         }
 
-        .photocard:hover {
+        .photocard:hover,
+        .photocard.photocard-hover {
             box-shadow:
                 0 16px 50px rgba(155, 89, 182, .45),
                 0 0 25px rgba(155, 89, 182, .15);
             border-color: rgba(201, 160, 220, .5);
             z-index: 20 !important;
+        }
+
+        .photocard:active {
+            box-shadow: 0 12px 40px rgba(155, 89, 182, .5);
         }
 
         .photocard::before {
@@ -1035,9 +1040,15 @@
             }
 
             function resetCard(card, i) {
-                card.classList.remove('lifted');
+                card.classList.remove('lifted', 'photocard-hover');
                 card.style.zIndex = zIndexes[i];
                 card.style.transform = `translateY(calc(-50% + ${yShifts[i]}px)) rotate(${angles[i]}deg)`;
+            }
+
+            function applyHoverEffect(card) {
+                card.classList.add('photocard-hover');
+                card.style.zIndex = 20;
+                card.style.transform = `translateY(calc(-50% - 15px)) rotate(0deg) scale(1.06)`;
             }
 
             layout();
@@ -1046,6 +1057,18 @@
             let liftedIdx = -1;
 
             cards.forEach((card, i) => {
+                card.addEventListener('mouseenter', () => {
+                    if (liftedIdx !== i) applyHoverEffect(card);
+                });
+                card.addEventListener('mouseleave', () => {
+                    if (liftedIdx !== i) resetCard(card, i);
+                });
+                card.addEventListener('touchstart', () => {
+                    if (liftedIdx !== i) applyHoverEffect(card);
+                }, { passive: true });
+                card.addEventListener('touchend', () => {
+                    setTimeout(() => { if (liftedIdx !== i) resetCard(card, i); }, 0);
+                }, { passive: true });
                 card.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (liftedIdx === i) {
